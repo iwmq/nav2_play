@@ -1,0 +1,5 @@
+<library path="nav2_play_plugins">
+	<class name="nav2_play_plugins/NotiAtWaypoint" type="nav2_play_plugins::NotiAtWaypoint" base_class_type="nav2_core::WaypointTaskExecutor">
+	  <description>This is an example plugin which notifies users at waypoint</description>
+	</class>
+</library>
