@@ -50,7 +50,7 @@ void NotiAtWaypoint::initialize(
   clock_ = node->get_clock();
 
   double timeout;
-  std::string input_topic;
+  std::string input_topic, noti_topic;
   nav2_util::declare_parameter_if_not_declared(
     node, plugin_name + ".timeout",
     rclcpp::ParameterValue(10.0));
@@ -60,9 +60,13 @@ void NotiAtWaypoint::initialize(
   nav2_util::declare_parameter_if_not_declared(
     node, plugin_name + ".input_topic",
     rclcpp::ParameterValue("input_at_waypoint/input"));
+  nav2_util::declare_parameter_if_not_declared(
+    node, plugin_name + ".noti_topic",
+    rclcpp::ParameterValue("input_at_waypoint/notification"));
   node->get_parameter(plugin_name + ".timeout", timeout);
   node->get_parameter(plugin_name + ".enabled", is_enabled_);
   node->get_parameter(plugin_name + ".input_topic", input_topic);
+  node->get_parameter(plugin_name + ".noti_topic", noti_topic);
 
   timeout_ = rclcpp::Duration(timeout, 0.0);
 
@@ -70,6 +74,12 @@ void NotiAtWaypoint::initialize(
     logger_, "NotiAtWaypoint: Subscribing to input topic %s.", input_topic.c_str());
   subscription_ = node->create_subscription<std_msgs::msg::Empty>(
     input_topic, 1, std::bind(&NotiAtWaypoint::Cb, this, _1));
+
+  RCLCPP_INFO(
+    logger_, "NotiAtWaypoint: Ready to publish notification topic %s.", noti_topic.c_str());
+  pub_ = node->create_publisher<std_msgs::msg::String>(
+    noti_topic, rclcpp::SystemDefaultsQoS());
+  pub_->on_activate();
 }
 
 void NotiAtWaypoint::Cb(const std_msgs::msg::Empty::SharedPtr /*msg*/)
@@ -85,6 +95,10 @@ bool NotiAtWaypoint::processAtWaypoint(
   if (!is_enabled_) {
     return true;
   }
+
+  std_msgs::msg::String msg;
+  msg.data = "Calling NotiAtWaypoint::processAtWaypoint()";
+  pub_->publish(msg);
 
   input_received_ = false;
 

@@ -21,6 +21,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/empty.hpp"
+#include "std_msgs/msg/string.hpp"
 #include "rclcpp_lifecycle/lifecycle_node.hpp"
 #include "nav2_core/waypoint_task_executor.hpp"
 
@@ -78,6 +79,9 @@ protected:
   rclcpp::Clock::SharedPtr clock_;
   std::mutex mutex_;
   rclcpp::Subscription<std_msgs::msg::Empty>::SharedPtr subscription_;
+  // NOTE: the publisher must be rclcpp_lifecycle one, and must call on_activate()
+  // after being created, as the node (parent) is a LifeCycleNode.
+  rclcpp_lifecycle::LifecyclePublisher<std_msgs::msg::String>::SharedPtr pub_;
 };
 
 }  // namespace nav2_play_plugins
