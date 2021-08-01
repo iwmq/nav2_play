@@ -58,12 +58,22 @@ add_library(${library_name} SHARED
   src/noti_at_waypoint.cpp
   src/straight_line_planner.cpp
 )
-
 ament_target_dependencies(${library_name}
   ${dependencies}
 )
-
 target_compile_definitions(${library_name} PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
+
+# Needed for test
+add_library(noti_at_waypoint SHARED src/noti_at_waypoint.cpp)
+ament_target_dependencies(noti_at_waypoint ${dependencies})
+#prevent pluginlib from using boost
+target_compile_definitions(noti_at_waypoint PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
+
+# Needed for test
+add_library(straight_line_planner SHARED src/straight_line_planner.cpp)
+ament_target_dependencies(straight_line_planner ${dependencies})
+#prevent pluginlib from using boost
+target_compile_definitions(straight_line_planner PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
 
 # NOTE: Must install in target nav2_waypoint_follower
 pluginlib_export_plugin_description_file(
@@ -76,7 +86,7 @@ pluginlib_export_plugin_description_file(
   global_planner_plugin.xml
 )
 
-install(TARGETS ${library_name}
+install(TARGETS ${library_name} noti_at_waypoint straight_line_planner
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/${PROJECT_NAME}
@@ -94,13 +104,9 @@ install(FILES
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
-  # the following line skips the linter which checks for copyrights
-  # uncomment the line when a copyright and license is not present in all source files
-  #set(ament_cmake_copyright_FOUND TRUE)
-  # the following line skips cpplint (only works in a git repo)
-  # uncomment the line when this package is not in a git repo
-  #set(ament_cmake_cpplint_FOUND TRUE)
+  find_package(ament_cmake_gtest REQUIRED)
   ament_lint_auto_find_test_dependencies()
+  add_subdirectory(test)
 endif()
 
 ament_export_include_directories(include)
