@@ -36,7 +36,7 @@ public:
 };
 RclCppFixture g_rclcppfixture;
 
-TEST(NotiAtWaypointTest, NoInput)
+TEST(NotiAtWaypointTest, test_no_input)
 {
   auto node = std::make_shared<rclcpp_lifecycle::LifecycleNode>("testNotiAtWaypoint");
 
@@ -59,7 +59,7 @@ TEST(NotiAtWaypointTest, NoInput)
 }
 
 
-TEST(NotiAtWaypointTest, GetInput)
+TEST(NotiAtWaypointTest, test_get_input)
 {
   auto node = std::make_shared<rclcpp_lifecycle::LifecycleNode>("testNotiAtWaypoint");
   
@@ -97,7 +97,7 @@ TEST(NotiAtWaypointTest, GetInput)
 }
 
 
-TEST(NotiAtWaypointTest, GetNotification)
+TEST(NotiAtWaypointTest, test_notification)
 {
   auto node = std::make_shared<rclcpp_lifecycle::LifecycleNode>("testNotiAtWaypoint");
 
@@ -128,7 +128,6 @@ TEST(NotiAtWaypointTest, GetNotification)
   node->declare_parameter("NAP.timeout", 1.0);
   node->declare_parameter("NAP.input_topic", "/waypoint_follower/noti_at_wait");
   node->declare_parameter("NAP.noti_topic", "/waypoint_follower/notification");
-
 
   nav2_play_plugins::NotiAtWaypoint nap;
   nap.initialize(node, std::string("NAP"));
