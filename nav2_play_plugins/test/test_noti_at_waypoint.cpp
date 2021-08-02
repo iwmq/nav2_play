@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License. Reserved.
 
+#include <atomic>
 #include <math.h>
 #include <memory>
 #include <string>
 #include <vector>
 #include <utility>
 #include <thread>
+#include <chrono>
 
 #include "gtest/gtest.h"
 #include "rclcpp/rclcpp.hpp"
@@ -91,5 +93,56 @@ TEST(NotiAtWaypointTest, GetInput)
   // Has input now, shold work
   std::thread t{publish_message};
   EXPECT_TRUE(nap.processAtWaypoint(pose, 0));
+  t.join();
+}
+
+
+TEST(NotiAtWaypointTest, GetNotification)
+{
+  auto node = std::make_shared<rclcpp_lifecycle::LifecycleNode>("testNotiAtWaypoint");
+
+  std::string notification;
+  std::atomic_bool done{false};
+
+  auto sub_cb =
+    [&, this](const std_msgs::msg::String::SharedPtr msg) -> void
+    {
+      notification = msg->data;
+    };
+
+  auto subscribe_message =
+    [&, this](std::atomic_bool *test_done) -> void
+    {
+      auto sub = node->create_subscription<std_msgs::msg::String>(
+        "/waypoint_follower/notification",
+        rclcpp::QoS(1),
+        sub_cb
+      );
+
+      while (rclcpp::ok() && !(*test_done))
+      {
+        rclcpp::spin_some(node->shared_from_this()->get_node_base_interface());
+      }
+    };
+
+  node->declare_parameter("NAP.timeout", 1.0);
+  node->declare_parameter("NAP.input_topic", "/waypoint_follower/noti_at_wait");
+  node->declare_parameter("NAP.noti_topic", "/waypoint_follower/notification");
+
+
+  nav2_play_plugins::NotiAtWaypoint nap;
+  nap.initialize(node, std::string("NAP"));
+
+  std::thread t(subscribe_message, &done);
+  // Let t be scheduled
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+
+  geometry_msgs::msg::PoseStamped pose;
+  nap.processAtWaypoint(pose, 0);
+
+  // Stop t
+  done = true;
+
+  ASSERT_STREQ(notification.c_str(), "Calling NotiAtWaypoint::processAtWaypoint()");
   t.join();
 }
