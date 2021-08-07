@@ -1,3 +1,17 @@
+// Copyright (c) 2021, Jay Wang
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License. Reserved.
+
 #include <cmath>
 #include <string>
 #include <memory>
@@ -29,7 +43,7 @@ namespace nav2_play_plugins
             name_ + ".interpolation_resolution",
             rclcpp::ParameterValue(0.1)
         );
-        
+
         node_->get_parameter(name_ + ".interpolation_resolution", interpolation_resolution_);
     }
 
@@ -82,11 +96,11 @@ namespace nav2_play_plugins
         if (start.header.frame_id != global_frame_)
         {
             RCLCPP_ERROR(
-                logger_, 
+                logger_,
                 "Planner will only except start position from %s frame",
                 global_frame_.c_str()
             );
-            
+
             return global_path;
         }
 
@@ -132,7 +146,7 @@ namespace nav2_play_plugins
 
         return global_path;
     }
-} // nav2_play_plugins
+}  // namespace nav2_play_plugins
 
 #include "pluginlib/class_list_macros.hpp"
 PLUGINLIB_EXPORT_CLASS(nav2_play_plugins::StraightLine, nav2_core::GlobalPlanner)

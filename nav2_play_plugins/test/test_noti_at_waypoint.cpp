@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License. Reserved.
 
-#include <atomic>
 #include <math.h>
+#include <atomic>
 #include <memory>
 #include <string>
 #include <vector>
@@ -62,10 +62,10 @@ TEST(NotiAtWaypointTest, test_no_input)
 TEST(NotiAtWaypointTest, test_get_input)
 {
   auto node = std::make_shared<rclcpp_lifecycle::LifecycleNode>("testNotiAtWaypoint");
-  
+
   auto pub = node->create_publisher<std_msgs::msg::Empty>("/waypoint_follower/noti_at_wait", 1);
   pub->on_activate();
-  auto publish_message = 
+  auto publish_message =
     [&, this]() -> void
     {
       rclcpp::Rate(1).sleep();
